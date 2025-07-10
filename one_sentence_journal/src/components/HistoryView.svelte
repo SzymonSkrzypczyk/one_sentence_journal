@@ -1,63 +1,123 @@
 <script>
-  import SentenceItem from './SentenceItem.svelte';
+  import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
 
-  const sentences = [
-    { date: '2025-07-10', text: 'Dziś jest piękny dzień, pełen słońca. Cieszę się każdą chwilą.' },
-    { date: '2025-07-09', text: 'Wczoraj padało, ale i tak było miło spędzić czas w domu z książką.' },
-    { date: '2025-07-08', text: 'Nowe wyzwania czekają, jestem gotowy na wszystko, co przyniesie ten tydzień.' },
-    // ... więcej
+  // Mock data, replace with your real data source or props
+  let sentences = [
+    { date: '2025-07-10', text: 'Dziś jest piękny dzień, pełen słońca.' },
+    { date: '2025-07-09', text: 'Wczoraj padało, ale i tak było miło.' },
+    { date: '2025-07-08', text: 'Nowe wyzwania czekają, jestem gotowy.' },
+    { date: '2025-07-07', text: 'Poniedziałek to zawsze dobry początek.' },
+    { date: '2025-07-06', text: 'Weekend minął zbyt szybko.' },
+    { date: '2025-07-05', text: 'Spotkanie z przyjaciółmi zawsze poprawia humor.' },
+    { date: '2025-07-04', text: 'Nowa książka wciągnęła mnie bez reszty.' },
+    { date: '2025-07-03', text: 'Dzień pełen produktywności.' },
+    { date: '2025-07-02', text: 'Małe gesty potrafią sprawić największą radość.' },
+    { date: '2025-07-01', text: 'Czas na nowe cele i marzenia.' },
+    { date: '2025-06-30', text: 'Koniec miesiąca to dobry moment.' },
+    { date: '2025-06-29', text: 'Spokojny wieczór w domu.' }
   ];
+
+  // Reactive page size based on window width
+  let pageSize = 10;
+  let currentPage = 1;
+
+  function updatePageSize() {
+    pageSize = window.innerWidth < 768 ? 5 : 10;
+    currentPage = 1; // reset to first page when size changes
+  }
+
+  onMount(() => {
+    updatePageSize();
+    window.addEventListener('resize', updatePageSize);
+    return () => window.removeEventListener('resize', updatePageSize);
+  });
+
+  // Compute the sentences for current page
+  $: start = (currentPage - 1) * pageSize;
+  $: end = start + pageSize;
+  $: pageSentences = sentences.slice(start, end);
+
+  const totalPages = () => Math.ceil(sentences.length / pageSize);
+
+  function prevPage() {
+    if (currentPage > 1) currentPage -= 1;
+  }
+  function nextPage() {
+    if (currentPage < totalPages()) currentPage += 1;
+  }
 </script>
 
-<div class="container">
-  <h1>Moja Historia</h1>
-  <div class="scrollable">
-    {#each sentences as { date, text } (date)}
-      <SentenceItem {date} {text} />
-    {/each}
+<div class="scrollable-text">
+  {#each pageSentences as item}
+    <div class="sentence-item">
+      <span class="date-display">{item.date}</span>
+      <p>{item.text}</p>
+    </div>
+  {/each}
+
+  <div class="pagination-controls">
+    <button on:click={prevPage} disabled={currentPage === 1}>Poprzednia</button>
+    <span>{currentPage} / {totalPages()}</span>
+    <button on:click={nextPage} disabled={currentPage === totalPages()}>Następna</button>
   </div>
 </div>
 
 <style>
-  .container {
-    max-width: 42rem;
-    width: 100%;
-    margin: 0 auto;
-    padding: 1rem;
-    border: 2px solid #000;
-    background-color: #fff;
-    box-sizing: border-box;
-  }
-
-  h1 {
-    font-size: 2.8em;
-    color: #000;
-    text-align: center;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #000;
-    padding-bottom: 10px;
-    line-height: 1;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .scrollable {
+  .scrollable-text {
     max-height: 70vh;
     overflow-y: auto;
-    border: 2px solid #000;
+    border: 2px solid #000000;
     background-color: #f8f8f8;
     padding: 15px;
     box-sizing: border-box;
   }
 
-  .scrollable::-webkit-scrollbar {
-    width: 12px;
+  .sentence-item {
+    position: relative;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #ffffff;
+    border: 1px dashed #000000;
+  }
+  .sentence-item:last-child {
+    margin-bottom: 0;
   }
 
-  .scrollable::-webkit-scrollbar-track {
-    background: #f8f8f8;
+  .date-display {
+    position: absolute;
+    top: -10px;
+    left: 5px;
+    background-color: #ffff99;
+    color: #000;
+    font-family: 'Gochi Hand', cursive;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    white-space: nowrap;
   }
 
-  .scrollable::-webkit-scrollbar-thumb {
-    background-color: #808080;
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 10px;
+  }
+
+  button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+
+  button:disabled {
+    background-color: #888;
+    cursor: default;
   }
 </style>
