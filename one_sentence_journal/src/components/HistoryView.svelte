@@ -48,13 +48,15 @@
   }
 </script>
 
-<div class="scrollable-text">
-  {#each pageSentences as item}
-    <div class="sentence-item">
-      <span class="date-display">{item.date}</span>
-      <p>{item.text}</p>
-    </div>
-  {/each}
+<div class="history-container">
+  <div class="scrollable-list">
+    {#each pageSentences as item}
+      <div class="sentence-item">
+        <span class="date-display">{item.date}</span>
+        <p>{item.text}</p>
+      </div>
+    {/each}
+  </div>
 
   <div class="pagination-controls">
     <button on:click={prevPage} disabled={currentPage === 1}>Poprzednia</button>
@@ -64,13 +66,19 @@
 </div>
 
 <style>
-  .scrollable-text {
-    max-height: 70vh;
-    overflow-y: auto;
+  .history-container {
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
     border: 2px solid #000000;
     background-color: #f8f8f8;
-    padding: 15px;
     box-sizing: border-box;
+  }
+
+  .scrollable-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 15px;
   }
 
   .sentence-item {
@@ -80,6 +88,7 @@
     background-color: #ffffff;
     border: 1px dashed #000000;
   }
+
   .sentence-item:last-child {
     margin-bottom: 0;
   }
@@ -99,11 +108,13 @@
   }
 
   .pagination-controls {
+    padding: 10px;
+    border-top: 2px solid #000000;
+    background-color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-top: 10px;
   }
 
   button {
