@@ -8,6 +8,20 @@
 		console.log('Submitted sentence:', sentence);
 		goto('/');
 	}
+
+	function logout() {
+		fetch('/logout', { method: 'POST', credentials: 'include' })
+			.catch(() => {
+
+			});
+	}
+    
+	if (typeof window !== 'undefined') {
+		window.addEventListener('beforeunload', logout);
+		window.addEventListener('visibilitychange', () => {
+			if (document.visibilityState === 'hidden') logout();
+		});
+	}
 </script>
 
 <div class="add-wrapper">
