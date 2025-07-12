@@ -1,4 +1,10 @@
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect, type Actions, type ServerLoad } from '@sveltejs/kit';
+
+export const load: ServerLoad = ({ locals }) => {
+	if (locals.user) {
+		throw redirect(302, '/add');
+	}
+};
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {

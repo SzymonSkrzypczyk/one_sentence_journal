@@ -1,8 +1,7 @@
-import { redirect, type Load } from '@sveltejs/kit';
+import { redirect, type ServerLoad } from '@sveltejs/kit';
 
-export const load: Load = async (event) => {
-	const parentData = await event.parent();
-	if (!parentData.user) {
+export const load: ServerLoad = ({ locals }) => {
+	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 };

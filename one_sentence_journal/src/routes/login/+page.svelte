@@ -1,5 +1,5 @@
 <script>
-
+    import { page } from '$app/stores';
 </script>
 
 <div class="login-wrapper">
@@ -19,7 +19,9 @@
 
 			<button type="submit">Zaloguj</button>
 
-			<p class="error-message hidden">Nieprawidłowa nazwa użytkownika lub hasło</p>
+            {#if $page.form?.invalid}
+			    <p class="error-message hidden">Nieprawidłowa nazwa użytkownika lub hasło</p>
+            {/if}
 		</form>
 	</div>
 </div>
