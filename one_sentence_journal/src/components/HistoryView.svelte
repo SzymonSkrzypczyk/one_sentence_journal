@@ -1,52 +1,36 @@
-<script>
-  import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+<script lang="ts">
+	export let sentences: { date: string; text: string }[];
 
-  // Mock data, replace with your real data source or props
-  let sentences = [
-    { date: '2025-07-10', text: 'Dziś jest piękny dzień, pełen słońca.' },
-    { date: '2025-07-09', text: 'Wczoraj padało, ale i tak było miło.' },
-    { date: '2025-07-08', text: 'Nowe wyzwania czekają, jestem gotowy.' },
-    { date: '2025-07-07', text: 'Poniedziałek to zawsze dobry początek.' },
-    { date: '2025-07-06', text: 'Weekend minął zbyt szybko.' },
-    { date: '2025-07-05', text: 'Spotkanie z przyjaciółmi zawsze poprawia humor.' },
-    { date: '2025-07-04', text: 'Nowa książka wciągnęła mnie bez reszty.' },
-    { date: '2025-07-03', text: 'Dzień pełen produktywności.' },
-    { date: '2025-07-02', text: 'Małe gesty potrafią sprawić największą radość.' },
-    { date: '2025-07-01', text: 'Czas na nowe cele i marzenia.' },
-    { date: '2025-06-30', text: 'Koniec miesiąca to dobry moment.' },
-    { date: '2025-06-29', text: 'Spokojny wieczór w domu.' }
-  ];
+	import { onMount } from 'svelte';
 
-  // Reactive page size based on window width
-  let pageSize = 10;
-  let currentPage = 1;
+	let pageSize = 10;
+	let currentPage = 1;
 
-  function updatePageSize() {
-    pageSize = window.innerWidth < 768 ? 5 : 10;
-    currentPage = 1; // reset to first page when size changes
-  }
+	function updatePageSize() {
+		pageSize = window.innerWidth < 768 ? 5 : 10;
+		currentPage = 1;
+	}
 
-  onMount(() => {
-    updatePageSize();
-    window.addEventListener('resize', updatePageSize);
-    return () => window.removeEventListener('resize', updatePageSize);
-  });
+	onMount(() => {
+		updatePageSize();
+		window.addEventListener('resize', updatePageSize);
+		return () => window.removeEventListener('resize', updatePageSize);
+	});
 
-  // Compute the sentences for current page
-  $: start = (currentPage - 1) * pageSize;
-  $: end = start + pageSize;
-  $: pageSentences = sentences.slice(start, end);
+	$: start = (currentPage - 1) * pageSize;
+	$: end = start + pageSize;
+	$: pageSentences = sentences.slice(start, end);
 
-  const totalPages = () => Math.ceil(sentences.length / pageSize);
+	const totalPages = () => sentences.length > 0?Math.ceil(sentences.length / pageSize):1;
 
-  function prevPage() {
-    if (currentPage > 1) currentPage -= 1;
-  }
-  function nextPage() {
-    if (currentPage < totalPages()) currentPage += 1;
-  }
+	function prevPage() {
+		if (currentPage > 1) currentPage -= 1;
+	}
+	function nextPage() {
+		if (currentPage < totalPages()) currentPage += 1;
+	}
 </script>
+
 
 <div class="history-container">
   <div class="scrollable-list">

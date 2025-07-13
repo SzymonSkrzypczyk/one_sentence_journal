@@ -1,11 +1,13 @@
-<script>
+<script lang="ts">
   import HistoryView from '../components/HistoryView.svelte';
+  export let data: { sentences: { date: string; text: string }[] };
 </script>
 
 <main>
   <h1 class="page-title">Moje Przemyślenia ;D</h1>
   <div class="wrapper">
-    <HistoryView />
+    <HistoryView sentences={data.sentences} />
+
   </div>
 </main>
 
