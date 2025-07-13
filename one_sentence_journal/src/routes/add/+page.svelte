@@ -1,44 +1,88 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
 
 	let sentence = '';
+	let message = '';
+	let messageType: 'success' | 'error' | '' = '';
 
-	function handleSubmit(event: SubmitEvent) {
+	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		console.log('Submitted sentence:', sentence);
-		goto('/');
+
+		if (!sentence.trim()) {
+			message = 'Please enter a sentence.';
+			messageType = 'error';
+			return;
+		}
+
+		try {
+			const res = await fetch('/add-sentence', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ sentence })
+			});
+
+			if (res.ok) {
+				message = 'Sentence saved successfully!';
+				messageType = 'success';
+				sentence = '';
+
+				setTimeout(() => {
+					goto('/');
+				}, 1000);
+			} else {
+				const data = await res.json();
+				message = data.error ?? 'Failed to save sentence.';
+				messageType = 'error';
+			}
+		} catch (err) {
+			message = 'Network error, please try again.';
+			messageType = 'error';
+		}
 	}
 
 	function logout() {
-		fetch('/logout', { method: 'POST', credentials: 'include' })
-			.catch(() => {
-
-			});
+		fetch('/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
 	}
-    
+
 	if (typeof window !== 'undefined') {
 		window.addEventListener('beforeunload', logout);
 		window.addEventListener('visibilitychange', () => {
 			if (document.visibilityState === 'hidden') logout();
 		});
 	}
+
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('beforeunload', logout);
+			window.removeEventListener('visibilitychange', () => {
+				if (document.visibilityState === 'hidden') logout();
+			});
+		}
+	});
 </script>
 
 <div class="add-wrapper">
 	<form class="add-form" on:submit={handleSubmit}>
-		<h1>Add a Sentence</h1>
+		<h1>Dodaj dzisiejsze przemyślenie</h1>
 
-		<label for="sentence">Write your sentence:</label>
+		<label for="sentence">Dzisiejsza myśl:</label>
 		<input
 			type="text"
 			id="sentence"
 			name="sentence"
 			bind:value={sentence}
-			placeholder="Today I learned..."
+			placeholder="Dzisiaj..."
 			required
 		/>
 
-		<button type="submit">Save</button>
+		<button type="submit">Zapisz</button>
+
+		{#if message}
+			<p class={messageType === 'success' ? 'message-success' : 'message-error'}>
+				{message}
+			</p>
+		{/if}
 	</form>
 </div>
 
@@ -102,6 +146,16 @@
 	button[type="submit"]:hover {
 		transform: translate(1px, 1px);
 		box-shadow: 1px 1px 0 #000;
+	}
+
+	.message-success {
+		color: green;
+		font-weight: 700;
+	}
+
+	.message-error {
+		color: red;
+		font-weight: 700;
 	}
 
 	@media (max-width: 480px) {
