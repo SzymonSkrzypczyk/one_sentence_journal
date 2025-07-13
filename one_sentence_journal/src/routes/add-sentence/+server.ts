@@ -4,7 +4,7 @@ import { json } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response('Nie tak szybko Panie Kolego', { status: 401 });
   }
 
   const { sentence } = await request.json();
@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const existing = await query(`SELECT 1 FROM sentences WHERE date = CURRENT_DATE`);
 
     if ((existing.rowCount ?? 0) > 0) {
-      return json({ error: 'Sentence for today has already been added.' }, { status: 409 });
+      return json({ error: 'Juz dodano zdanie na dziś.' }, { status: 409 });
     }
 
     // Insert new sentence
